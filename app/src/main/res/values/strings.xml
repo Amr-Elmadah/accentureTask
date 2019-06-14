@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">AccentureTask</string>
+    <string name="internet_connection">No internet connection</string>
+
+    //AlbumList
+    <string name="home">Album List</string>
+    <string name="no_data">No data</string>
 </resources>

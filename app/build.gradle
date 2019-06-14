@@ -1,34 +1,138 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
+def QA = true
 android {
-    compileSdkVersion 29
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
+
     defaultConfig {
-        applicationId "com.tasks.accenturetask"
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+
+        applicationId globalConfiguration["androidApplicationId"]
+        versionCode globalConfiguration["androidVersionCode"]
+        versionName globalConfiguration["androidVersionName"]
+        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        testApplicationId globalConfiguration["testApplicationId"]
+        multiDexEnabled true
     }
+    androidExtensions {
+        experimental = true
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "developer"
+
+    productFlavors.all {
+        QA = true
+        buildConfigField "boolean", "QA", "" + QA
+    }
+    productFlavors {
+        staging {
+            dimension "developer"
+            QA = true
+            buildConfigField "boolean", "QA", "" + QA
+        }
+        production {
+            dimension "developer"
+            QA = false
+            buildConfigField "boolean", 'QA', "" + QA
+        }
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.2.0-alpha01'
+
+    //Androidx
+    implementation presentationDependencies.appcompat
+    implementation presentationDependencies.legacy
+    implementation presentationDependencies.material
+    implementation presentationDependencies.cardview
+    implementation presentationDependencies.recyclerview
+    implementation presentationDependencies.constraintlayout
+    //UI
+    implementation presentationDependencies.sdpAndroid
+    implementation presentationDependencies.avLoader
+    implementation glideDependencies.glide
+    implementation "jp.wasabeef:glide-transformations:3.1.1"
+    kapt glideDependencies.compiler
+    implementation presentationDependencies.roundedImageView
+    kapt dataBindingDependencies.dataBinding
+
+    // dagger
+    implementation daggerDependencies.dagger
+    kapt daggerDependencies.daggerCompiler
+    implementation daggerDependencies.daggerAndroid
+    implementation daggerDependencies.daggerAndroidSupport
+    kapt daggerDependencies.daggerAndroidProcessor
+
+    implementation rxDependencies.rxJava
+    implementation rxDependencies.rxAndroid
+
+    //Network
+    implementation retrofitDependencies.retrofit
+    implementation retrofitDependencies.converterScalars
+    implementation retrofitDependencies.converterGson
+    implementation retrofitDependencies.okhttp
+    implementation retrofitDependencies.okhttpLogging
+    implementation retrofitDependencies.retrofitRx
+    implementation dataDependencies.okhttpFacebook
+
+    //Parcel
+    implementation dataDependencies.parcelerApi
+    kapt dataDependencies.parceler
+
+    //Room DB
+    implementation roomDependencies.runtime
+    implementation roomDependencies.compiler
+    implementation roomDependencies.rx
+    annotationProcessor roomDependencies.runtime
+    annotationProcessor roomDependencies.compiler
+
+    debugImplementation leakCanaryDependencies.developmentLeakCanary
+    releaseImplementation leakCanaryDependencies.releaseLeakCanary
+
+    //Test
+    testImplementation dataTestDependencies.junit
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    testImplementation 'org.mockito:mockito-inline:2.13.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.7.22'
+    testImplementation "android.arch.core:core-testing:1.1.1"
+
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    configurations {
+        all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
 }
