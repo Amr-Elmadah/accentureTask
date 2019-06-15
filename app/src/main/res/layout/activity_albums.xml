@@ -18,22 +18,24 @@
             app:subtitleTextColor="@android:color/white"
             app:titleTextColor="@android:color/white"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAlbums"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/srlAlbums"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-    <ProgressBar
-            android:id="@+id/progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAlbums"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+            android:id="@+id/llNoData"
+            layout="@layout/layout_no_data"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
