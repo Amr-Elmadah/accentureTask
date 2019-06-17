@@ -3,6 +3,7 @@ package com.tasks.accenturetask
 import android.app.Activity
 import android.app.Application
 import com.facebook.stetho.Stetho
+import com.squareup.leakcanary.LeakCanary
 import com.tasks.accenturetask.injection.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -21,6 +22,7 @@ class App : Application(), HasActivityInjector {
         super.onCreate()
         initDagger()
         initStetho()
+        initLeakCanary()
     }
 
     private fun initStetho() {
@@ -39,5 +41,9 @@ class App : Application(), HasActivityInjector {
             .application(this)
             .build()
             .inject(this)
+    }
+
+    private fun initLeakCanary() {
+        LeakCanary.install(this)
     }
 }
